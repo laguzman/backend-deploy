@@ -1,7 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from pydantic import BaseModel
 from prisma import Prisma
 from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI()
 
 app.add_middleware(
@@ -22,37 +23,44 @@ class NoteRead(BaseModel):
     email: str
     name: str
 
+# Create a single Prisma instance
+db = Prisma()
+
+@app.on_event("startup")
+async def startup():
+    await db.connect()
+
+@app.on_event("shutdown")
+async def shutdown():
+    await db.disconnect()
+
+# Dependency to get the database instance
+async def get_db():
+    return db
 
 @app.get("/")
-async def get_note():
-    async with Prisma() as db:
-        data = await db.note.find_many()
+async def get_note(db: Prisma = Depends(get_db)):
+    data = await db.note.find_many()
     return data
-
 
 @app.post("/")
-async def create_note(note: NoteCreate):
-    async with Prisma() as db:
-        data = await db.note.create(
-            data=note.model_dump()
-        )
+async def create_note(note: NoteCreate, db: Prisma = Depends(get_db)):
+    data = await db.note.create(
+        data=note.model_dump()
+    )
     return data
-
 
 @app.put("/{id}")
-async def update_note(id: str, note: NoteCreate):
-    async with Prisma() as db:
-        data = await db.note.update(
-            where={"id": id},
-            data=note.model_dump()
-        )
+async def update_note(id: str, note: NoteCreate, db: Prisma = Depends(get_db)):
+    data = await db.note.update(
+        where={"id": id},
+        data=note.model_dump()
+    )
     return data
 
-
 @app.delete("/{id}")
-async def update_note(id: str,):
-    async with Prisma() as db:
-        data = await db.note.delete(
-            where={"id": id}
-        )
+async def delete_note(id: str, db: Prisma = Depends(get_db)):
+    data = await db.note.delete(
+        where={"id": id}
+    )
     return data
