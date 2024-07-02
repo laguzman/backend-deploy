@@ -4,19 +4,14 @@ services:
     env: python
     buildCommand: |
       pip install -r requirements.txt
-      pip install prisma
-      prisma --version
-      prisma generate
       python -m prisma generate
-      python -c "from prisma import Prisma; Prisma()"
-      prisma db push
+      python prisma_setup.py
+      python -m prisma db push
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: DATABASE_URL
-        value: file:./database.db
+        value: file:./prisma/database.db
       - key: PYTHONPATH
         value: .
-    prebuild:
-      - pip install prisma
-      - prisma generate
-      - python -m prisma generate
+      - key: PRISMA_CLIENT_ENGINE_TYPE
+        value: binary
