@@ -2,8 +2,14 @@ services:
   - type: web
     name: fastapi-prisma-app
     env: python
-    buildCommand: pip install -r requirements.txt && prisma generate && prisma db push
+    buildCommand: |
+      pip install -r requirements.txt
+      pip install prisma
+      prisma generate
+      prisma db push
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: DATABASE_URL
         value: file:./database.db
+      - key: PYTHONPATH
+        value: .
