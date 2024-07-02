@@ -5,7 +5,10 @@ services:
     buildCommand: |
       pip install -r requirements.txt
       pip install prisma
+      prisma --version
       prisma generate
+      python -m prisma generate
+      python -c "from prisma import Prisma; Prisma()"
       prisma db push
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
@@ -13,3 +16,7 @@ services:
         value: file:./database.db
       - key: PYTHONPATH
         value: .
+    prebuild:
+      - pip install prisma
+      - prisma generate
+      - python -m prisma generate
