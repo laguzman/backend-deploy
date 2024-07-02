@@ -15,6 +15,8 @@ app.add_middleware(
 
 app.include_router(note_router)
 
+prisma = Prisma()
+
 
 @app.on_event("startup")
 async def startup():
