@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from controllers.note_controller import router as note_router
+from prisma import Prisma
 
 app = FastAPI()
 
@@ -13,3 +14,12 @@ app.add_middleware(
 )
 
 app.include_router(note_router)
+
+
+@app.on_event("startup")
+async def startup():
+    await prisma.connect()
+
+@app.on_event("shutdown")
+async def shutdown():
+    await prisma.disconnect()
