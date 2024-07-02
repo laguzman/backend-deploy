@@ -1,14 +1,9 @@
 services:
   - type: web
-    name: fastapi-prisma-app
+    name: fastapi-sqlite-app
     env: python
-    buildCommand: |
-      pip install -r requirements.txt
-      python -m prisma generate
-      python -m prisma py fetch
+    buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
-      - key: DATABASE_URL
-        value: file:./prisma/dev.db
       - key: PYTHONPATH
         value: .

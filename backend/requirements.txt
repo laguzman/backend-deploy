@@ -1,3 +1,4 @@
 fastapi
 uvicorn
-prisma==0.13.1
+sqlalchemy
+aiosqlite
