@@ -3,11 +3,11 @@ services:
     name: fastapi-sqlite-app
     env: python
     buildCommand: |
+      pip install --upgrade pip
       pip install -r requirements.txt
-      python -c "import sqlite3; sqlite3.connect('test.db').close()"
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHONPATH
         value: .
       - key: DATABASE_URL
-        value: sqlite:///./test.db
+        value: sqlite+aiosqlite:///./test.db
